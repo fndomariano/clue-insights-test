@@ -1,0 +1,25 @@
+version: '3'
+services:
+    app:
+        build:
+            context: devops/python/
+        container_name: ci_app
+        ports:
+            - 5000:5000
+        volumes:
+            - .:/code
+        links:
+            - db
+    
+    db:
+        container_name: ci_db
+        image: mysql:8.0
+        env_file:
+          - .env
+        ports:
+            - "3306:3306"
+        environment:
+            - MYSQL_DATABASE=${DB_NAME}
+            - MYSQL_USER=${DB_USER}
+            - MYSQL_PASSWORD=${DB_PASSWORD}
+            - MYSQL_ROOT_PASSWORD=${DB_ROOT_PASSWORD}
