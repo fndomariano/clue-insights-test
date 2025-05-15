@@ -1,4 +1,4 @@
-version: '3'
+version: '3.9'
 services:
     app:
         build:
@@ -8,8 +8,10 @@ services:
             - 5000:5000
         volumes:
             - .:/code
-        links:
+        depends_on:
             - db
+        networks:
+            - ci_network
     
     db:
         container_name: ci_db
@@ -19,7 +21,18 @@ services:
         ports:
             - "3306:3306"
         environment:
-            - MYSQL_DATABASE=${DB_NAME}
+            - MYSQL_DATABASE=${DB_DATABASE}
             - MYSQL_USER=${DB_USER}
             - MYSQL_PASSWORD=${DB_PASSWORD}
             - MYSQL_ROOT_PASSWORD=${DB_ROOT_PASSWORD}
+        networks:
+            - ci_network
+        volumes:
+            - mysqldata:/var/lib/mysql
+
+volumes:
+  mysqldata:
+
+networks: 
+  ci_network:
+    driver: bridge
