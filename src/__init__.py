@@ -13,7 +13,7 @@ load_dotenv()
 
 app = Flask(__name__)
 
-app.config['SQLALCHEMY_DATABASE_URI'] = "mysql://root:root@db:3306/ci_test"
+app.config['SQLALCHEMY_DATABASE_URI'] = "mysql://root:"+os.getenv("DB_ROOT_PASSWORD")+"@db:3306/"+os.getenv("DB_NAME")
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = os.getenv('SQLALCHEMY_TRACK_MODIFICATIONS')
 
 db = SQLAlchemy()
@@ -31,8 +31,3 @@ jwt.init_app(app)
 migrate = Migrate(app, db)
 
 debug = True if os.getenv('DEBUG') == 'True' else False
-
-from src.views import auth
-from src.models.plan import Plan
-from src.models.subscription import Subscription
-
