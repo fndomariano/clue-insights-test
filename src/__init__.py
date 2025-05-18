@@ -31,3 +31,11 @@ jwt.init_app(app)
 migrate = Migrate(app, db)
 
 debug = True if os.getenv('DEBUG') == 'True' else False
+
+from src.models.plan import Plan
+from src.models.user import User
+from src.models.subscription import Subscription
+
+import src.views.user
+import src.views.plan
+import src.views.auth
