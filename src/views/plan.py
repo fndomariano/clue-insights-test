@@ -1,8 +1,11 @@
 from flask import request, jsonify
+from flask_jwt_extended import jwt_required, get_jwt_identity
 from marshmallow import ValidationError
 from src import app, db
 from src.models.plan import Plan
+from src.models.subscription import Subscription
 from src.schemas.plan import PlanSchema
+from datetime import datetime
 
 
 @app.route('/plan', methods=['GET'])
@@ -115,3 +118,21 @@ def changeStatus(id):
     db.session.commit()
 
     return jsonify(message='The Plan has been deleted.'), 204
+
+
+@app.route('/plan/<id>/subscribe', methods=['POST'])
+@jwt_required()
+def subscribe(id):    
+    user_id = get_jwt_identity()    
+    plan = Plan.query.get(id)
+
+    if not plan:
+        return jsonify(error='The Plan was not found.'), 404
+    
+    Subscription.query.filter_by(user_id=user_id, active=True).update({'active': False, 'canceled_at': datetime.utcnow()})
+
+    sub = Subscription(user_id=user_id, plan_id=plan.id)
+    db.session.add(sub)
+    db.session.commit()
+
+    return jsonify(message='The subscription has been completed.'), 200

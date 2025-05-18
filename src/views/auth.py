@@ -1,6 +1,20 @@
-from flask import jsonify
-from src import app
+from flask import jsonify, request
+from flask_jwt_extended import create_access_token
+from src import app, bcrypt
+from src.models.user import User
 
-@app.route('/auth/login', methods=['GET'])
+@app.route('/auth/login', methods=['POST'])
 def login():
-    return jsonify(message='Login'), 201
+    data = request.get_json()
+    user = User.query.filter_by(email=data['email']).first()
+    if user and bcrypt.check_password_hash(user.password_hash, data['password']):
+        access_token = create_access_token(
+            identity=str(user.id),
+            additional_claims={"sub": str(user.id)}
+        )
+        return jsonify(access_token=access_token)
+    return jsonify(message='Invalid credentials'), 401
+
+@app.route('/auth/logout', methods=['POST'])
+def logout():    
+    return jsonify(message='Logout'), 401
