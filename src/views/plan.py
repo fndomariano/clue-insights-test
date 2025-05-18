@@ -50,9 +50,9 @@ def get(id):
 def create():
     schema = PlanSchema()
     
-    try:
-        data = schema.load(request.get_json())
-    except ValidationError as err:
+    try:        
+        data = schema.load(request.get_json())        
+    except ValidationError as err:        
         return jsonify(err.messages), 422
     
             
