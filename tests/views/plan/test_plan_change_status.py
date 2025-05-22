@@ -1,7 +1,7 @@
 from src.models.plan import Plan
 from src import db
 
-def test_change_status(client):
+def test_change_status(client, seed_plans):
     # given
     id = 1
     currentStatusPlan = db.session.get(Plan, id).active

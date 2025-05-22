@@ -1,7 +1,7 @@
 from src.models.plan import Plan
-from src import db
+from src import db, bcrypt
 
-def test_delete(client):
+def test_delete(client, seed_plans):
     # when
     response = client.delete('/plan/1')
     

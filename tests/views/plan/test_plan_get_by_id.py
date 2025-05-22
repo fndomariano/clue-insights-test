@@ -1,7 +1,7 @@
 from src.models.plan import Plan
 from src import db
 
-def test_get(client):
+def test_get(client, seed_plans):
     # given
     plan = db.session.get(Plan, 1)
 

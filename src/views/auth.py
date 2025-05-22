@@ -13,8 +13,4 @@ def login():
             additional_claims={"sub": str(user.id)}
         )
         return jsonify(access_token=access_token)
-    return jsonify(message='Invalid credentials'), 401
-
-@app.route('/auth/logout', methods=['POST'])
-def logout():    
-    return jsonify(message='Logout'), 401
+    return jsonify(error='Invalid credentials'), 401

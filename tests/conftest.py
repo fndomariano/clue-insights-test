@@ -13,15 +13,12 @@ def client():
 
     with app.app_context():
         db.create_all()
-        seed_database()
         yield app.test_client()
         db.session.remove()
         db.drop_all()
 
-def seed_database():
-    create_plans()
-
-def create_plans():
+@pytest.fixture
+def seed_plans():
     plans = [Plan(name=fake.name(), price=fake.random_digit()) for _ in range(15)]
     db.session.bulk_save_objects(plans)
     db.session.commit()

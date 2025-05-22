@@ -1,6 +1,6 @@
 from src.models.plan import Plan
 
-def test_update(client):
+def test_update(client, seed_plans):
     # given
     payload = {
         'name': 'Premium',
