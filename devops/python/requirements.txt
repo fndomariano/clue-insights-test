@@ -7,3 +7,4 @@ pytest
 mysqlclient
 python-dotenv
 marshmallow
+faker

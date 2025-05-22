@@ -37,7 +37,7 @@ def list():
 @app.route('/plan/<id>', methods=['GET'])
 def get(id):
         
-    plan = Plan.query.get(id)
+    plan = db.session.get(Plan, id)
 
     if not plan:
         return jsonify(error='The Plan was not found.'), 404
@@ -53,7 +53,7 @@ def create():
     try:        
         data = schema.load(request.get_json())        
     except ValidationError as err:        
-        return jsonify(err.messages), 422
+        return jsonify(errors=err.messages), 422
     
             
     plan = Plan(name=data['name'], price=data['price'])
@@ -72,9 +72,9 @@ def update(id):
     try:
         data = schema.load(request.get_json())
     except ValidationError as err:
-        return jsonify(err.messages), 422
+        return jsonify(errors=err.messages), 422
     
-    plan = Plan.query.get(id)
+    plan = db.session.get(Plan, id)
 
     if not plan:
         return jsonify(error='The Plan was not found.'), 404
@@ -93,7 +93,7 @@ def update(id):
 @app.route('/plan/<id>', methods=['DELETE'])
 def delete(id):
         
-    plan = Plan.query.get(id)
+    plan = db.session.get(Plan, id)
 
     if not plan:
         return jsonify(error='The Plan was not found.'), 404
@@ -107,7 +107,7 @@ def delete(id):
 @app.route('/plan/<id>/changeStatus', methods=['POST'])
 def changeStatus(id):
         
-    plan = Plan.query.get(id)
+    plan = db.session.get(Plan, id)
 
     if not plan:
         return jsonify(error='The Plan was not found.'), 404
@@ -124,7 +124,7 @@ def changeStatus(id):
 @jwt_required()
 def subscribe(id):    
     user_id = get_jwt_identity()    
-    plan = Plan.query.get(id)
+    plan = db.session.get(Plan, id)
 
     if not plan:
         return jsonify(error='The Plan was not found.'), 404

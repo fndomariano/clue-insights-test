@@ -1,0 +1,21 @@
+from src.models.plan import Plan
+from src import db
+
+def test_delete(client):
+    # when
+    response = client.delete('/plan/1')
+    
+    # then
+    assert 204 == response.status_code
+    assert db.session.get(Plan, id) is None    
+
+
+def test_not_found(client):
+    # when
+    response = client.delete('/plan/0')
+    
+    # then       
+    assert 404 == response.status_code
+    data = response.get_json()
+    assert "error" in data
+    assert "The Plan was not found." in data["error"]

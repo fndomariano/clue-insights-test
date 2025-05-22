@@ -1,19 +1,5 @@
-from src import app, db
 from src.models.plan import Plan
-import pytest
 
-
-@pytest.fixture
-def client():
-    app.config['TESTING'] = True
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///:memory:'
-
-    with app.app_context():
-        db.create_all()
-        yield app.test_client()
-        db.session.remove()
-        db.drop_all()
-    
 def test_add(client):
     # given
     payload = {
@@ -36,5 +22,10 @@ def test_required_validation(client):
     # when
     response = client.post('/plan', json={})
     
-    # then        
+    # then       
     assert 422 == response.status_code
+    
+    data = response.get_json()
+    assert "errors" in data
+    assert "name" in data["errors"]
+    assert "price" in data["errors"]

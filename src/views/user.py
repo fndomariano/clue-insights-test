@@ -12,7 +12,7 @@ def register():
     try:
         data = schema.load(request.get_json())                
     except ValidationError as err:
-        return jsonify(err.messages), 422
+        return jsonify(errors=err.messages), 422
     
     hashed_pw = bcrypt.generate_password_hash(data['password']).decode('utf-8')
         
