@@ -2,14 +2,21 @@ from src import db
 from src.models.plan import Plan
 from src.models.subscription import Subscription
 
-def test_subscription(client, seed_plans, auth_token):
+def test_subscription(client, auth_token):
+    # given 
+    plan_free = Plan(name="Free", price=0)
+    db.session.add(plan_free)
+    db.session.commit()
+
     # when
     response = client.post(
-        "/plan/1/subscribe",        
+        "/subscriptions/subscribe",
+        json={"plan_id": str(plan_free.id)},
         headers={"Authorization": f"Bearer {auth_token}"}
     )
 
-    # then
+    # then    
+    print(response.get_json())
     assert response.status_code == 200
 
     subscription = db.session.query(Subscription).filter_by(user_id=1, plan_id=1).first()
@@ -35,7 +42,8 @@ def test_upgrade_subscription(client, auth_token):
     
     # when
     response = client.post(
-        "/plan/"+str(plan_basic.id)+"/subscribe",
+        "/subscriptions/subscribe",
+        json={"plan_id": str(plan_basic.id)},
         headers={"Authorization": f"Bearer {auth_token}"}
     )
 
@@ -51,3 +59,28 @@ def test_upgrade_subscription(client, auth_token):
     assert subscription_basic is not None        
     assert subscription_basic.canceled_at is None
     assert subscription_basic.active is True
+
+
+def test_cancel_subscription(client, auth_token):
+    # given
+    plan_free = Plan(name="Free", price=0)
+    db.session.add(plan_free)
+    db.session.commit()
+
+    subscription = Subscription(plan_id=plan_free.id, user_id=1)
+    db.session.add(subscription)
+    db.session.commit()
+
+    # when
+    response = client.post(
+        "/subscriptions/cancel",
+        headers={"Authorization": f"Bearer {auth_token}"}
+    )
+
+    # then
+    assert response.status_code == 200
+
+    subscription = db.session.query(Subscription).filter_by(user_id=1, plan_id=plan_free.id).first()
+    assert subscription is not None
+    assert subscription.canceled_at is not None
+    assert subscription.active is False

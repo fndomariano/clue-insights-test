@@ -120,19 +120,3 @@ def changeStatus(id):
     return jsonify(message='The Plan has been deleted.'), 204
 
 
-@app.route('/plan/<id>/subscribe', methods=['POST'])
-@jwt_required()
-def subscribe(id):    
-    user_id = get_jwt_identity()    
-    plan = db.session.get(Plan, id)
-
-    if not plan:
-        return jsonify(error='The Plan was not found.'), 404
-    
-    Subscription.query.filter_by(user_id=user_id, active=True).update({'active': False, 'canceled_at': datetime.now(UTC)})
-
-    sub = Subscription(user_id=user_id, plan_id=plan.id)
-    db.session.add(sub)
-    db.session.commit()
-
-    return jsonify(message='The subscription has been completed.'), 200

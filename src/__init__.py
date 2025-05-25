@@ -41,3 +41,4 @@ from src.models.subscription import Subscription
 import src.views.user
 import src.views.plan
 import src.views.auth
+import src.views.subscription
