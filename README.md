@@ -13,11 +13,16 @@ cp .env-sample .env
 b) Up the docker containers
 
 ```bash
-docker-compose up -d --build
+docker compose up -d --build
 ```
 
 c)  Run migrations
 
 ```bash
-docker-compose exec app flask db upgrade  
+docker compose exec app flask db upgrade  
+```
+
+d) Run tests
+```bash
+docker compose exec app pytest
 ```

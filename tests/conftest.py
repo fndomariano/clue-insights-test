@@ -1,7 +1,9 @@
-from src import app, db
+from src import app, db, bcrypt
 from src.models.plan import Plan
+from src.models.user import User
 import pytest
 from faker import Faker
+from flask_jwt_extended import create_access_token
 
 fake = Faker()
 
@@ -22,3 +24,16 @@ def seed_plans():
     plans = [Plan(name=fake.name(), price=fake.random_digit()) for _ in range(15)]
     db.session.bulk_save_objects(plans)
     db.session.commit()
+
+@pytest.fixture
+def auth_token():
+    user = User(
+        name="User Test",
+        email="user@test.com",
+        password_hash=bcrypt.generate_password_hash("Secret.123").decode('utf-8')
+    )
+    db.session.add(user)
+    db.session.commit()
+
+    token = create_access_token(identity=str(user.id))
+    return token

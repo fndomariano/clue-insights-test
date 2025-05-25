@@ -5,7 +5,7 @@ from src import app, db
 from src.models.plan import Plan
 from src.models.subscription import Subscription
 from src.schemas.plan import PlanSchema
-from datetime import datetime
+from datetime import datetime, UTC
 
 
 @app.route('/plan', methods=['GET'])
@@ -17,9 +17,9 @@ def list():
     query = Plan.query
 
     if name_filter:
-        query = query.filter(Plan.name.ilike(f"%{name_filter}%"))
+        query = query.filter(Plan.name.ilike(f"%{name_filter}%"))    
 
-    pagination = query.paginate(page=page, per_page=per_page, error_out=False)
+    pagination = query.paginate(page=page, per_page=per_page, error_out=False)    
 
     schema = PlanSchema(many=True)
     plans = schema.dump(pagination.items)
@@ -129,7 +129,7 @@ def subscribe(id):
     if not plan:
         return jsonify(error='The Plan was not found.'), 404
     
-    Subscription.query.filter_by(user_id=user_id, active=True).update({'active': False, 'canceled_at': datetime.utcnow()})
+    Subscription.query.filter_by(user_id=user_id, active=True).update({'active': False, 'canceled_at': datetime.now(UTC)})
 
     sub = Subscription(user_id=user_id, plan_id=plan.id)
     db.session.add(sub)
