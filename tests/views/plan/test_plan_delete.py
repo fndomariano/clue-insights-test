@@ -1,5 +1,5 @@
 from src.models.plan import Plan
-from src import db, bcrypt
+from src import db
 
 def test_delete(client, seed_plans):
     # when

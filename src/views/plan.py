@@ -1,11 +1,8 @@
 from flask import request, jsonify
-from flask_jwt_extended import jwt_required, get_jwt_identity
 from marshmallow import ValidationError
 from src import app, db
 from src.models.plan import Plan
-from src.models.subscription import Subscription
 from src.schemas.plan import PlanSchema
-from datetime import datetime, UTC
 
 
 @app.route('/plan', methods=['GET'])
@@ -18,6 +15,8 @@ def list():
 
     if name_filter:
         query = query.filter(Plan.name.ilike(f"%{name_filter}%"))    
+
+    query = query.order_by(Plan.name.asc())
 
     pagination = query.paginate(page=page, per_page=per_page, error_out=False)    
 

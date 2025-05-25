@@ -1,11 +1,49 @@
 from flask import request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
+from sqlalchemy.sql import text
 from marshmallow import ValidationError
 from datetime import datetime, UTC
 from src import app, db
 from src.models.plan import Plan
 from src.models.subscription import Subscription
-from src.schemas.subscription import SubscriptionSchema
+from src.schemas.subscription import SubscriptionSchema, SubscriptionHistorySchema
+
+
+@app.route('/subscriptions/history', methods=['GET'])
+@jwt_required()
+def subscription_history():
+    user_id = get_jwt_identity()
+    page = request.args.get('page', 1, type=int)
+    per_page = request.args.get('per_page', 10, type=int)
+    offset = (page - 1) * per_page
+
+    sql = '''
+        SELECT s.id, s.created_at, s.canceled_at, s.active, p.id as plan_id, p.name as plan_name
+        FROM subscription s
+        INNER JOIN plan p ON s.plan_id = p.id
+        WHERE s.user_id = :user_id
+        ORDER BY s.created_at DESC
+        LIMIT :per_page OFFSET :offset
+    '''
+    result = db.session.execute(text(sql), {
+        'user_id': user_id,
+        'per_page': per_page,
+        'offset': offset
+    })
+    items = [
+        {
+            'created_at': row.created_at.isoformat() if row.created_at else None,
+            'canceled_at': row.canceled_at.isoformat() if row.canceled_at else None,
+            'active': row.active,
+            'plan': {
+                'id': row.plan_id,
+                'name': row.plan_name
+            }
+        }
+        for row in result
+    ]
+        
+    return jsonify({'data': items}), 200
 
 @app.route('/subscriptions/subscribe', methods=['POST'])
 @jwt_required()
@@ -30,6 +68,8 @@ def subscribe():
     db.session.commit()
 
     return jsonify(message='The subscription has been completed.'), 200
+
+
 
 @app.route('/subscriptions/cancel', methods=['POST'])
 @jwt_required()
