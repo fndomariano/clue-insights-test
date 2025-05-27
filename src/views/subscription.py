@@ -34,7 +34,7 @@ def subscription_history():
     items = [
         {
             'canceled_at': row.canceled_at.isoformat() if row.canceled_at else None,
-            'active': row.active,
+            'active': True if row.active == 1 else False,
             'plan': {
                 'id': row.plan_id,
                 'name': row.plan_name
