@@ -16,7 +16,6 @@ def test_subscription(client, auth_token):
     )
 
     # then    
-    print(response.get_json())
     assert response.status_code == 200
 
     subscription = db.session.query(Subscription).filter_by(user_id=1, plan_id=1).first()

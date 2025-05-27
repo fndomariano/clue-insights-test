@@ -1,22 +1,24 @@
-from src import app, db, bcrypt
+from src import create_app, db, bcrypt
 from src.models.plan import Plan
 from src.models.user import User
 from src.models.subscription import Subscription
-import pytest
 from faker import Faker
 from flask_jwt_extended import create_access_token
+import pytest
+import os
 
 fake = Faker()
 
 @pytest.fixture
-def client():
-    app.config['TESTING'] = True
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///:memory:'
-    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+def client():        
+        
+    os.environ['CONFIG_TYPE'] = 'config.TestingConfig'
+    
+    flask_app = create_app()
 
-    with app.app_context():
+    with flask_app.app_context():
         db.create_all()
-        yield app.test_client()
+        yield flask_app.test_client()
         db.session.remove()
         db.drop_all()
 
@@ -28,7 +30,17 @@ def seed_plans():
     return plans
 
 @pytest.fixture
+def seed_subscriptions(seed_plans):
+    subscriptions = [Subscription(user_id=1, plan_id=plan.id) for plan in seed_plans]
+    db.session.add_all(subscriptions)
+    db.session.commit()
+    return subscriptions
+
+
+@pytest.fixture
 def auth_token():
+    User.query.delete()
+    db.session.commit()
     user = User(
         name="User Test",
         email="user@test.com",

@@ -1,13 +1,8 @@
-from src import app, db
+from src import db
 from src.models.subscription import Subscription
 
 
-def test_list_history_first_page(client, seed_plans, auth_token):    
-    # given 
-    subscriptions = [Subscription(user_id=1, plan_id=seed_plans[int(i)].id) for i in range(len(seed_plans))]    
-    db.session.add_all(subscriptions)
-    db.session.commit()
-
+def test_list_history_first_page(client, seed_subscriptions, auth_token):    
     # when
     response = client.get(
         '/subscriptions/history',
@@ -22,12 +17,7 @@ def test_list_history_first_page(client, seed_plans, auth_token):
     assert len(data["data"]) == 10    
 
 
-def test_list_history_last_page(client, seed_plans, auth_token):
-    # given 
-    subscriptions = [Subscription(user_id=1, plan_id=seed_plans[int(i)].id) for i in range(len(seed_plans))]    
-    db.session.add_all(subscriptions)
-    db.session.commit()
-
+def test_list_history_last_page(client, seed_subscriptions, auth_token):
     # when
     response = client.get(
         '/subscriptions/history?per_page=9&page=2',

@@ -8,7 +8,7 @@ def test_add(client):
     }
     
     # when
-    response = client.post('/plan', json=payload)
+    response = client.post('/plan/', json=payload)
     
     # then
     plan = Plan.query.filter_by(name=payload['name']).first()
@@ -20,7 +20,7 @@ def test_add(client):
 def test_required_validation(client):
         
     # when
-    response = client.post('/plan', json={})
+    response = client.post('/plan/', json={})
     
     # then       
     assert 422 == response.status_code

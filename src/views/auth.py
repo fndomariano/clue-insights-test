@@ -1,9 +1,12 @@
-from flask import jsonify, request
+from flask import Blueprint, jsonify, request
 from flask_jwt_extended import create_access_token
-from src import app, bcrypt
+from src import bcrypt
 from src.models.user import User
 
-@app.route('/auth/login', methods=['POST'])
+
+bp = Blueprint('auth', __name__, url_prefix='/auth')
+
+@bp.route('/login', methods=['POST'])
 def login():
     data = request.get_json()
     user = User.query.filter_by(email=data['email']).first()

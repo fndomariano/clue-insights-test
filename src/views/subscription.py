@@ -1,15 +1,16 @@
-from flask import request, jsonify
+from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from sqlalchemy.sql import text
 from marshmallow import ValidationError
 from datetime import datetime, UTC
-from src import app, db
+from src import db
 from src.models.plan import Plan
 from src.models.subscription import Subscription
-from src.schemas.subscription import SubscriptionSchema, SubscriptionHistorySchema
+from src.schemas.subscription import SubscriptionSchema
 
+bp = Blueprint('subscriptions', __name__, url_prefix='/subscriptions')
 
-@app.route('/subscriptions/history', methods=['GET'])
+@bp.route('/history', methods=['GET'])
 @jwt_required()
 def subscription_history():
     user_id = get_jwt_identity()
@@ -32,7 +33,6 @@ def subscription_history():
     })
     items = [
         {
-            'created_at': row.created_at.isoformat() if row.created_at else None,
             'canceled_at': row.canceled_at.isoformat() if row.canceled_at else None,
             'active': row.active,
             'plan': {
@@ -45,7 +45,7 @@ def subscription_history():
         
     return jsonify({'data': items}), 200
 
-@app.route('/subscriptions/subscribe', methods=['POST'])
+@bp.route('/subscribe', methods=['POST'])
 @jwt_required()
 def subscribe():        
     user_id = get_jwt_identity()   
@@ -71,7 +71,7 @@ def subscribe():
 
 
 
-@app.route('/subscriptions/cancel', methods=['POST'])
+@bp.route('/cancel', methods=['POST'])
 @jwt_required()
 def cancel():
     user_id = get_jwt_identity()

@@ -4,7 +4,7 @@ from src.models.plan import Plan
 
 def test_list_plans_first_page(client, seed_plans):
     # when
-    response = client.get('/plan')
+    response = client.get('/plan/')
     
     # then
     assert response.status_code == 200
@@ -19,7 +19,7 @@ def test_list_plans_first_page(client, seed_plans):
 
 def test_list_plans_last_page(client, seed_plans):
     # when
-    response = client.get('/plan?per_page=9&page=2')
+    response = client.get('/plan/?per_page=9&page=2')
     
     # then
     assert response.status_code == 200
@@ -38,7 +38,7 @@ def test_list_plans_name_filter(client, seed_plans):
     db.session.commit()
 
     # when
-    response = client.get('/plan?name=Basic')
+    response = client.get('/plan/?name=Basic')
     
     # then
     assert response.status_code == 200
@@ -53,7 +53,7 @@ def test_list_plans_name_filter(client, seed_plans):
 
 def test_list_empty_plans(client):
     # when
-    response = client.get('/plan')
+    response = client.get('/plan/')
     
     # then
     assert response.status_code == 200

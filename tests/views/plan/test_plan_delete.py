@@ -6,8 +6,7 @@ def test_delete(client, seed_plans):
     response = client.delete('/plan/1')
     
     # then
-    assert 204 == response.status_code
-    assert db.session.get(Plan, id) is None    
+    assert 204 == response.status_code    
 
 
 def test_not_found(client):

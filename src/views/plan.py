@@ -1,11 +1,12 @@
-from flask import request, jsonify
+from flask import Blueprint, request, jsonify
 from marshmallow import ValidationError
-from src import app, db
+from src import db
 from src.models.plan import Plan
 from src.schemas.plan import PlanSchema
 
+bp = Blueprint('plan', __name__, url_prefix='/plan')
 
-@app.route('/plan', methods=['GET'])
+@bp.route('/', methods=['GET'])
 def list():
     page = request.args.get('page', 1, type=int)
     per_page = request.args.get('per_page', 10, type=int)
@@ -33,7 +34,7 @@ def list():
         }
     })
 
-@app.route('/plan/<id>', methods=['GET'])
+@bp.route('/<id>', methods=['GET'])
 def get(id):
         
     plan = db.session.get(Plan, id)
@@ -45,7 +46,7 @@ def get(id):
 
 
 
-@app.route('/plan', methods=['POST'])
+@bp.route('/', methods=['POST'])
 def create():
     schema = PlanSchema()
     
@@ -63,7 +64,7 @@ def create():
 
 
 
-@app.route('/plan/<id>', methods=['PUT'])
+@bp.route('/<id>', methods=['PUT'])
 def update(id):
     
     schema = PlanSchema()
@@ -89,7 +90,7 @@ def update(id):
     return jsonify(message='The Plan has been updated.'), 204
 
 
-@app.route('/plan/<id>', methods=['DELETE'])
+@bp.route('/<id>', methods=['DELETE'])
 def delete(id):
         
     plan = db.session.get(Plan, id)
@@ -103,7 +104,7 @@ def delete(id):
     return jsonify(message='The Plan has been deleted.'), 204
 
 
-@app.route('/plan/<id>/changeStatus', methods=['POST'])
+@bp.route('/<id>/changeStatus', methods=['POST'])
 def changeStatus(id):
         
     plan = db.session.get(Plan, id)

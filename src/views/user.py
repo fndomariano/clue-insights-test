@@ -1,11 +1,12 @@
-from flask import request, jsonify
+from flask import Blueprint, request, jsonify
 from marshmallow import ValidationError
-from src import app, db, bcrypt
+from src import db, bcrypt
 from src.models.user import User
 from src.schemas.user import UserSchema
 
+bp = Blueprint('user', __name__, url_prefix='/user')
 
-@app.route('/user/register', methods=['POST'])
+@bp.route('/register', methods=['POST'])
 def register():
     schema = UserSchema()
     
